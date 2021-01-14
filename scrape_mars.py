@@ -7,13 +7,16 @@ from bs4 import BeautifulSoup
 from splinter import Browser
 import pandas as pd
 import datetime as dt
+from splinter import Browser
+from webdriver_manager.chrome import ChromeDriverManager
+import time
 
 
 #################################################
 # Windows
 #################################################
 #Set Executable Path & Initialize Chrome Browser
-executable_path = {'executable_path': "/Users/User/.wdm/drivers/chromedriver/win32/87.0.4280.88/chromedriver.exe"}
+executable_path = {'executable_path': ChromeDriverManager().install()}
 browser = Browser('chrome', **executable_path, headless=False)
 
 
@@ -78,9 +81,8 @@ def featured_image(browser):
     bs4 = BeautifulSoup(browser.html,'lxml')
     featured_img_url = bs4.find_all('img')[0]['src']
 
-    # Use Base URL to Create Absolute URL
-    img_url = f"https://www.jpl.nasa.gov{featured_img_url}"
-    return img_url
+    print(featured_img_url)
+    return featured_img_url
 
 
 
@@ -179,10 +181,10 @@ def scrape_hemisphere(html_text):
 # Main Web Scraping Bot
 #################################################
 def scrape_all():
-    executable_path = {"executable_path": "/Users/User/.wdm/drivers/chromedriver/win32/87.0.4280.88/chromedriver.exe"}
+    executable_path = {"executable_path": ChromeDriverManager().install()}
     browser = Browser("chrome", **executable_path, headless=False)
     news_title, news_paragraph = mars_news(browser)
-    img_url = featured_image(browser)
+    featured_img_url = featured_image(browser)
     facts = mars_facts()
     hemisphere_image_urls = hemisphere(browser)
     timestamp = dt.datetime.now()
@@ -190,7 +192,7 @@ def scrape_all():
     data = {
         "news_title": news_title,
         "news_paragraph": news_paragraph,
-        "featured_image": img_url,
+        "featured_image": featured_img_url,
         "facts": facts,
         "hemispheres": hemisphere_image_urls,
         "last_modified": timestamp
