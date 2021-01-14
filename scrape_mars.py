@@ -54,33 +54,34 @@ def mars_news(browser):
 # JPL Mars Space Images - Featured Image
 #################################################
 # NASA JPL (Jet Propulsion Laboratory) Site Web Scraper
-# def featured_image(browser):
+def featured_image(browser):
 #     # Visit the NASA JPL (Jet Propulsion Laboratory) Site
-#     url = "https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
-#     browser.visit(url)
+    url_img = "https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
+    browser.visit(url_img)
 
-#     # Ask Splinter to Go to Site and Click Button with Class Name full_image
-#     # <button class="full_image">Full Image</button>
-#     full_image_button = browser.find_by_id("full_image")
-#     full_image_button.click()
+    link_bs = BeautifulSoup(browser.html,'lxml')
+    
+    # Navigate to navbar and click on 4th button 'Galleries'
+    buttons = browser.find_by_tag('button')
+    buttons[4].click()
+    bs2 = BeautifulSoup(browser.html,'lxml')
 
-#     # Find "More Info" Button and Click It
-#     browser.is_element_present_by_text("more info", wait_time=1)
-#     more_info_element = browser.find_link_by_partial_text("more info")
-#     more_info_element.click()
+    # Click on FEATURED IMAGE link
+    img = bs2.find_all(class_='text-subtitle-sm mb-2')[0].text.replace('\n','').strip()
+    browser.links.find_by_partial_text(img).click()
 
-#     # Parse Results HTML with BeautifulSoup
-#     html = browser.html
-#     image_soup = BeautifulSoup(html, "html.parser")
+    # Click on Download JPG button to obtain full size image url
+    bs3 = BeautifulSoup(browser.html,'lxml')
+    browser.links.find_by_partial_text('Download JPG').click()
 
-#     img = image_soup.select_one("figure.lede a img")
-#     try:
-#         img_url = img.get("src")
-#     except AttributeError:
-#         return None 
-#    # Use Base URL to Create Absolute URL
-#     img_url = f"https://www.jpl.nasa.gov{img_url}"
-#     return img_url
+    # Link for full size url
+    bs4 = BeautifulSoup(browser.html,'lxml')
+    featured_img_url = bs4.find_all('img')[0]['src']
+
+    # Use Base URL to Create Absolute URL
+    img_url = f"https://www.jpl.nasa.gov{featured_img_url}"
+    return img_url
+
 
 
 #################################################
@@ -104,7 +105,7 @@ def mars_facts():
     facts_table.columns=["Description", "Value"]
     facts_table.set_index("Description", inplace=True)
 
-    return facts_table.to_html(classes="table table-striped")
+    return facts_table.to_html(classes="table, table-striped")
 
 
 
@@ -181,7 +182,7 @@ def scrape_all():
     executable_path = {"executable_path": "/Users/User/.wdm/drivers/chromedriver/win32/87.0.4280.88/chromedriver.exe"}
     browser = Browser("chrome", **executable_path, headless=False)
     news_title, news_paragraph = mars_news(browser)
-    #img_url = featured_image(browser)
+    img_url = featured_image(browser)
     facts = mars_facts()
     hemisphere_image_urls = hemisphere(browser)
     timestamp = dt.datetime.now()
@@ -189,7 +190,7 @@ def scrape_all():
     data = {
         "news_title": news_title,
         "news_paragraph": news_paragraph,
-        #"featured_image": img_url,
+        "featured_image": img_url,
         "facts": facts,
         "hemispheres": hemisphere_image_urls,
         "last_modified": timestamp

@@ -12,7 +12,7 @@
     <div class="container">
         <!-- Jumbotron -->
         <!--IMAGES: https://images5.alphacoders.com/508/508358.jpg / https://vfxblog.com/wp-content/uploads/2016/12/marsattacks1b.jpg / https://i.gifer.com/embedded/download/NRfS.gif -->
-        <div class="jumbotron text-center" style="background-image: url(https://scx2.b-cdn.net/gfx/news/2020/astrobiologi.jpg); height: 400px; background-position: center; background-size: cover;">
+        <div class="jumbotron text-center" style="background-image: url(http://gortoncenter.org/wp-content/uploads/2018/05/The-Martian.jpg); height: 400px; background-position: center; background-size: cover;">
             <h1 class="display-3"><b>Mission to Mars</b></h1>
             <p><a class="btn btn-danger btn-lg" href="/scrape" role="button">Scrape New Data</a></p>
         </div>
@@ -23,35 +23,25 @@
                     <div class="media-body">
                         <h4>Latest Mars News</h4>
                         <h5 style="color: #DC143C">{{mars.news_title}}</h5>
-                        <p style="color: #ada8a8">{{mars.news_paragraph}}</p>
+                        <p style="color: #6b6969">{{mars.news_paragraph}}</p>
                     </div>
                 </div>
             </div>
         </div>   
-        <!-- JPL Mars Space Images - Featured Image
+        <!-- JPL Mars Space Images - Featured Image -->
         <div class="container">
             <div class="row" id="mars-featured-image">
                 <div class="col-lg-8 col-md-8 col-sm-12">
                 <h4>Featured Mars Image</h4>
-                    
-                    
-                </div> -->
-                <!-- Mars Weather -->
-                <!-- <div class="col-lg-4 col-md-4 col-sm-12" id="mars-weather">
-                    <div class="card" style="max-width: 18rem;">
-                        <div class="card-body text-white bg-danger">
-                            <h4 class="card-title">Current Weather on Mars</h4>
-                            <p class="card-text">{{mars.weather}}</p>
-                        </div>
-                    </div> --> -->
+                    <!-- If Images are False/None/Non-Existent, Then Default to Error Message -->
+                    <img src="{{mars.featured_image | default('static/images/error.png', true) }}" class="img-responsive" style="max-width:100%; max-height: auto;" alt="Mars Featured Image"/>
+                </div>
                     <!-- Mars Facts -->
                     <br>
-                    <div class="row" id="mars-facts" style="background-color: #eee7e7;">
+                    <div class="row" id="mars-facts">
                         <div class="col-md-12">
-                            <h4 style="color: #180101">Mars Facts</h4>
-                            <h5 style="color: #4d4b4b">{{mars.facts | safe}}</h5>
-                            
-                            
+                            <h4>Mars Facts</h4>
+                            <h5 style="background-color: rgb(53, 52, 52)">{{mars.facts | safe}}</h5>
                         </div>
                     </div>
                 </div>
