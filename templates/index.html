@@ -8,11 +8,11 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head> 
-<body class="text-white" style="background-color:black;">
+<body class="text-black" style="background-color:white;">
     <div class="container">
         <!-- Jumbotron -->
         <div class="jumbotron text-center" style="background-image: url(https://scx2.b-cdn.net/gfx/news/2020/astrobiologi.jpg); height: 400px; background-position: center; background-size: cover;">
-            <h1 class="display-3"><b>Mission to Mars</b></h1>
+            <h1 class="display-3" style="color:red;"><b>Mission to Mars</b></h1>
             <p><a class="btn btn-danger btn-lng" href="/scrape" role="button">Scrape New Data</a></p>
         </div>
         <!-- NASA Mars News -->
@@ -22,11 +22,12 @@
                     <div class="media-body">
                         <h4>Latest Mars News</h4>
                         <h5 style="color: #f05108">{{mars.news_title}}</h5>
-                        <p style="color: #f3eded">{{mars.news_paragraph}}</p>
+                        <p>{{mars.news_paragraph}}</p>
                     </div>
                 </div>
             </div>
         </div>   
+        <br>
         <!-- JPL Mars Space Images - Featured Image -->
         <div class="container">
             <div class="row" id="mars-featured-image">
@@ -34,21 +35,24 @@
                 <h4>Featured Mars Image</h4>
                     <img src="{{mars.featured_image}}" class="img-responsive" style="max-width:100%; max-height: auto;" alt="Mars Featured Image"/>
                 </div>
-                    <!-- Mars Facts -->              
+            </div>
+        </div>
+        <br>
+        <br>        
+                    <!-- Mars Facts --> 
+                <div class="container">             
                     <div class="row" id="mars-facts">
                         <div class="col-md-12">
                             <h4>Mars Facts</h4>
-                            <br>
                             <h5>{{mars.facts | safe}}</h5>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            
         <!--  Mars Hemispheres !-->
         <h4 style="padding-top: 50px; margin-top: 100px; text-align: center;">Mars Hemispheres</h4>
         <div class="card" style="background-color:black;">
-            <hr>
+           
             <div class="col-md-12">
                 <div class="row" id="mars-hemispheres">
                     {% for hemisphere in mars.hemispheres %}
