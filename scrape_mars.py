@@ -183,6 +183,7 @@ def scrape_hemisphere(html_text):
 def scrape_all():
     executable_path = {"executable_path": ChromeDriverManager().install()}
     browser = Browser("chrome", **executable_path, headless=False)
+
     news_title, news_paragraph = mars_news(browser)
     featured_img_url = featured_image(browser)
     facts = mars_facts()
@@ -200,5 +201,5 @@ def scrape_all():
     browser.quit()
     return data 
 
-if __name__ == "__main__":
-    print(scrape_all())
+# if __name__ == "__main__":
+#     print(scrape_all())
