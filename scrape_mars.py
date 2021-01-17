@@ -91,7 +91,7 @@ def scrape():
 #################################################
 # Mars Facts
 #################################################
-# Mars Weather Twitter Account Web Scraper
+# Mars Facts Table Web Scraper
 
     # Visit the Mars Facts webpage 
     mars_url = 'https://space-facts.com/mars/'
