@@ -12,19 +12,24 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 
+
 #################################################
 # Windows
 #################################################
 #Set Executable Path & Initialize Chrome Browser
-executable_path = {'executable_path': ChromeDriverManager().install()}
-browser = Browser('chrome', **executable_path, headless=False)
+def init_browser():
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    return Browser('chrome', **executable_path, headless=False)
 
 
 #################################################
 # NASA Mars News
 #################################################
 # NASA Mars News Site Web Scraper
-def mars_news(browser):
+def scrape():
+
+    browser = init_browser()
+    
     # Visit the NASA Mars News Site
     nasa_url = 'https://mars.nasa.gov/news/'
     browser.visit(nasa_url)
@@ -33,71 +38,64 @@ def mars_news(browser):
     nasa_html = browser.html
     soup_nasa = BeautifulSoup(nasa_html, "html.parser")
     
+    required_list = soup_nasa.find('ul', class_='item_list')
 
-    # Find Everything Inside:
-    #   <ul class="item_list">
-    #     <li class="slide">
-    try:
-        required_list = soup_nasa.select_one("ul.item_list li.slide")
-        required_list.find("div", class_="content_title")
+    required_list.find("div", class_="content_title")
 
-        # Scrape the Latest News Title
-        news_title = required_list.find("div", class_="content_title").get_text()
+    # Scrape the Latest News Title
+    # .text or .get_text()
+    news_title = required_list.find("div", class_="content_title").get_text()
 
-        # Scrape the Latest Paragraph Text
-        news_paragraph = required_list.find("div", class_="article_teaser_body").get_text()
+    # Scrape the Latest Paragraph Text
+    news_paragraph = required_list.find("div", class_="article_teaser_body").get_text()
 
-    except AttributeError:
-        return None, None
-
-    return news_title, news_paragraph
+    
 
 
+    
 #################################################
 # JPL Mars Space Images - Featured Image
 #################################################
 # NASA JPL (Jet Propulsion Laboratory) Site Web Scraper
-def featured_image(browser):
-#     # Visit the NASA JPL (Jet Propulsion Laboratory) Site
+
+    # Visit the NASA JPL (Jet Propulsion Laboratory) Site
     url_img = "https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
     browser.visit(url_img)
 
-    link_bs = BeautifulSoup(browser.html,'lxml')
-    
     # Navigate to navbar and click on 4th button 'Galleries'
-    buttons = browser.find_by_tag('button')
-    buttons[4].click()
-    bs2 = BeautifulSoup(browser.html,'lxml')
+    first_button = browser.find_by_tag('button')
+    first_button[4].click()
+    
+    #Extract the title of the image
+    img_title_soup = BeautifulSoup(browser.html,'html.parser')
+    title = img_title_soup.find('div', class_='col-span-3').text
+    image_title = title.split('.')
+    img_title = image_title[1]
 
-    # Click on FEATURED IMAGE link
-    img = bs2.find_all(class_='text-subtitle-sm mb-2')[0].text.replace('\n','').strip()
-    browser.links.find_by_partial_text(img).click()
+    #Click on 'Featured Image' text (link)
+    browser.links.find_by_partial_text('Featured Image').click()
 
-    # Click on Download JPG button to obtain full size image url
-    bs3 = BeautifulSoup(browser.html,'lxml')
+    #Extract the title of Featured Image
+    # img_soup = BeautifulSoup(browser.html,'html.parser')
+    # img_soup2 = img_soup.find('div', class_='PageImageDetail ThemeLight')
+    # img_title = img_soup2.find('h1', class_='text-h2').text
+    
+    #Click on 'Download JPG' button to get full size image
     browser.links.find_by_partial_text('Download JPG').click()
 
-    # Link for full size url
-    bs4 = BeautifulSoup(browser.html,'lxml')
-    featured_img_url = bs4.find_all('img')[0]['src']
-
-    print(featured_img_url)
-    return featured_img_url
-
-
+    #Scrape the webpage to get the image url
+    featured_image_soup = BeautifulSoup(browser.html,'html.parser')
+    featured_url = featured_image_soup.find_all('img')[0]['src']
+    
 
 #################################################
 # Mars Facts
 #################################################
 # Mars Weather Twitter Account Web Scraper
-def mars_facts():
+
     # Visit the Mars Facts webpage 
     mars_url = 'https://space-facts.com/mars/'
     browser.visit(mars_url)
-    
-    # Parse Results HTML with BeautifulSoup
-    mars_html = browser.html
-    soup_mars = BeautifulSoup(mars_html, "html.parser")
     
     #Read all the tables on the page
     tables = pd.read_html(mars_url)
@@ -107,7 +105,7 @@ def mars_facts():
     facts_table.columns=["Description", "Mars"]
     facts_table.set_index("Description", inplace=True)
 
-    return facts_table.to_html(classes="table, table-striped")
+    facts_table = facts_table.to_html(classes="table, table-striped")
 
 
 
@@ -115,7 +113,7 @@ def mars_facts():
 # Mars Hemispheres
 #################################################
 # Mars Hemispheres Web Scraper
-def hemisphere(browser):
+
     # Visit the USGS Astrogeology Science Center Site
     astro_url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars)'
     browser.visit(astro_url)
@@ -157,49 +155,23 @@ def hemisphere(browser):
     
         # Append the retreived information into a list of dictionaries 
         hemisphere_image_urls.append({"title" : title, "img_url" : img_url})
+
     
-    # Display hemisphere_image_urls
-    return hemisphere_image_urls
-
-# Helper Function
-def scrape_hemisphere(html_text):
-    hemisphere_soup = BeautifulSoup(html_text, "html.parser")
-    try: 
-        title_element = hemisphere_soup.find("h2", class_="title").get_text()
-        sample_element = hemisphere_soup.find("a", text="Sample").get("href")
-    except AttributeError:
-        title_element = None
-        sample_element = None 
-    hemisphere = {
-        "title": title_element,
-        "img_url": sample_element
-    }
-    return hemisphere
-
-
-#################################################
-# Main Web Scraping Bot
-#################################################
-def scrape_all():
-    executable_path = {"executable_path": ChromeDriverManager().install()}
-    browser = Browser("chrome", **executable_path, headless=False)
-
-    news_title, news_paragraph = mars_news(browser)
-    featured_img_url = featured_image(browser)
-    facts = mars_facts()
-    hemisphere_image_urls = hemisphere(browser)
-    timestamp = dt.datetime.now()
-
+    #Store the scraped data in a dictionary
+ 
     data = {
         "news_title": news_title,
         "news_paragraph": news_paragraph,
-        "featured_image": featured_img_url,
-        "facts": facts,
-        "hemispheres": hemisphere_image_urls,
-        "last_modified": timestamp
+        "img_title": img_title,
+        "featured_image": featured_url,
+        "facts": facts_table,
+        "hemispheres": hemisphere_image_urls
+        
     }
+
+    # Close the browser after scraping
     browser.quit()
+
+    # Return results
     return data 
 
-# if __name__ == "__main__":
-#     print(scrape_all())
